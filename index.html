@@ -76,6 +76,8 @@
         .facts-container {
             margin: 40px auto;
             max-width: 700px;
+            min-height: 100px;
+            position: relative;
         }
 
         .fact {
@@ -83,36 +85,19 @@
             border: 2px solid #4da6ff;
             border-radius: 15px;
             padding: 20px 30px;
-            margin: 20px 0;
             font-size: clamp(1rem, 3vw, 1.3rem);
             color: #66b3ff;
-            opacity: 0;
-            transform: translateX(-50px);
-            animation: slideIn 0.6s ease-out forwards;
             box-shadow: 0 5px 20px rgba(77, 166, 255, 0.2);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
         }
 
-        .fact:nth-child(1) {
-            animation-delay: 0.5s;
-        }
-
-        .fact:nth-child(2) {
-            animation-delay: 1.2s;
-        }
-
-        .fact:nth-child(3) {
-            animation-delay: 1.9s;
-        }
-
-        .fact:nth-child(4) {
-            animation-delay: 2.6s;
-        }
-
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .fact.active {
+            opacity: 1;
         }
 
         /* Loading Bar Container */
@@ -202,7 +187,6 @@
 
         /* AR Button */
         .ar-button {
-            display: none;
             background: linear-gradient(135deg, #4da6ff, #0066cc);
             color: white;
             font-family: 'Comic Sans MS', 'Comic Sans', cursive;
@@ -217,10 +201,15 @@
             box-shadow: 0 8px 25px rgba(77, 166, 255, 0.4);
             text-transform: uppercase;
             letter-spacing: 2px;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.3);
         }
 
         .ar-button.visible {
-            display: inline-block;
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
             animation: bounceIn 0.8s ease-out;
         }
 
@@ -337,6 +326,29 @@
         const loadingBar = document.getElementById('loadingBar');
         const loadingPercentage = document.getElementById('loadingPercentage');
         const arButton = document.getElementById('arButton');
+        const facts = document.querySelectorAll('.fact');
+
+        let currentFactIndex = 0;
+
+        // Cycling Facts Animation
+        function showFact(index) {
+            facts.forEach((fact, i) => {
+                if (i === index) {
+                    fact.classList.add('active');
+                } else {
+                    fact.classList.remove('active');
+                }
+            });
+        }
+
+        function cycleFacts() {
+            showFact(currentFactIndex);
+            currentFactIndex = (currentFactIndex + 1) % facts.length;
+        }
+
+        // Start cycling facts immediately
+        cycleFacts();
+        setInterval(cycleFacts, 4000); // Change fact every 4 seconds
 
         // Track loading progress
         modelViewer.addEventListener('progress', (event) => {
