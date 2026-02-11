@@ -187,6 +187,7 @@
 
         /* AR Button */
         .ar-button {
+            display: block;
             background: linear-gradient(135deg, #4da6ff, #0066cc);
             color: white;
             font-family: 'Comic Sans MS', 'Comic Sans', cursive;
@@ -207,6 +208,7 @@
         }
 
         .ar-button.visible {
+            display: block !important;
             opacity: 1;
             visibility: visible;
             transform: scale(1);
@@ -359,6 +361,7 @@
 
         // When model is loaded
         modelViewer.addEventListener('load', () => {
+            console.log('Model loaded successfully!');
             // Complete the loading bar
             loadingBar.style.width = '100%';
             loadingPercentage.textContent = '100%';
@@ -367,6 +370,9 @@
             setTimeout(() => {
                 modelViewer.classList.add('loaded');
                 arButton.classList.add('visible');
+                console.log('AR button should now be visible');
+                console.log('Button classes:', arButton.className);
+                console.log('Button computed style:', window.getComputedStyle(arButton).opacity);
             }, 500);
         });
 
