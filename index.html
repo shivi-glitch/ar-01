@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Burger Meal AR Experience</title>
+
+    <!-- Model Viewer Library for 3D/AR -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #000000 0%, #0a0a1a 100%);
+            color: #4da6ff;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Heading */
+        h1 {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: #66b3ff;
+            text-shadow: 0 0 20px rgba(77, 166, 255, 0.8),
+                0 0 40px rgba(77, 166, 255, 0.4);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(77, 166, 255, 0.8),
+                    0 0 40px rgba(77, 166, 255, 0.4);
+            }
+
+            to {
+                text-shadow: 0 0 30px rgba(77, 166, 255, 1),
+                    0 0 60px rgba(77, 166, 255, 0.6);
+            }
+        }
+
+        /* Video Container */
+        .video-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(77, 166, 255, 0.3);
+            border: 3px solid #4da6ff;
+        }
+
+        .video-container video {
+            width: 100%;
+            display: block;
+            background: #000;
+        }
+
+        /* Facts Section */
+        .facts-container {
+            margin: 40px auto;
+            max-width: 700px;
+        }
+
+        .fact {
+            background: rgba(77, 166, 255, 0.1);
+            border: 2px solid #4da6ff;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin: 20px 0;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #66b3ff;
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideIn 0.6s ease-out forwards;
+            box-shadow: 0 5px 20px rgba(77, 166, 255, 0.2);
+        }
+
+        .fact:nth-child(1) {
+            animation-delay: 0.5s;
+        }
+
+        .fact:nth-child(2) {
+            animation-delay: 1.2s;
+        }
+
+        .fact:nth-child(3) {
+            animation-delay: 1.9s;
+        }
+
+        .fact:nth-child(4) {
+            animation-delay: 2.6s;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Loading Bar Container */
+        .loading-section {
+            margin: 50px auto;
+            max-width: 600px;
+        }
+
+        .loading-text {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            color: #66b3ff;
+            margin-bottom: 15px;
+        }
+
+        .loading-bar-container {
+            width: 100%;
+            height: 40px;
+            background: rgba(77, 166, 255, 0.1);
+            border: 2px solid #4da6ff;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(77, 166, 255, 0.2);
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4da6ff, #66b3ff, #4da6ff);
+            background-size: 200% 100%;
+            border-radius: 25px;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: shimmer 2s linear infinite;
+            box-shadow: 0 0 20px rgba(77, 166, 255, 0.6);
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 200% 0%;
+            }
+        }
+
+        .loading-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+
+        /* Model Viewer */
+        model-viewer {
+            width: 100%;
+            height: 500px;
+            background: transparent;
+            margin: 30px auto;
+            display: none;
+            border-radius: 20px;
+            border: 3px solid #4da6ff;
+            box-shadow: 0 10px 40px rgba(77, 166, 255, 0.3);
+        }
+
+        model-viewer.loaded {
+            display: block;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* AR Button */
+        .ar-button {
+            display: none;
+            background: linear-gradient(135deg, #4da6ff, #0066cc);
+            color: white;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: bold;
+            padding: 18px 50px;
+            border: 3px solid #66b3ff;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 30px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(77, 166, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ar-button.visible {
+            display: inline-block;
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .ar-button:hover {
+            background: linear-gradient(135deg, #66b3ff, #0080ff);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(77, 166, 255, 0.6);
+        }
+
+        .ar-button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(77, 166, 255, 0.4);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                margin-bottom: 20px;
+            }
+
+            .video-container {
+                margin-bottom: 30px;
+            }
+
+            .fact {
+                padding: 15px 20px;
+                margin: 15px 0;
+            }
+
+            model-viewer {
+                height: 400px;
+            }
+
+            .ar-button {
+                padding: 15px 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            model-viewer {
+                height: 350px;
+            }
+
+            .loading-bar-container {
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>burger meal</h1>
+
+        <!-- Video Container -->
+        <div class="video-container">
+            <video autoplay loop muted playsinline>
+                <source src="video.webm" type="video/webm">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- Burger Facts -->
+        <div class="facts-container">
+            <div class="fact">🍔 The hamburger was invented in America in the late 1800s!</div>
+            <div class="fact">🌍 Americans consume over 50 billion burgers each year!</div>
+            <div class="fact">⭐ The world's most expensive burger costs over $5,000!</div>
+            <div class="fact">🎯 The largest burger ever made weighed 2,014 pounds!</div>
+        </div>
+
+        <!-- Loading Bar -->
+        <div class="loading-section">
+            <div class="loading-text">Loading your AR experience...</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+                <div class="loading-percentage" id="loadingPercentage">0%</div>
+            </div>
+        </div>
+
+        <!-- 3D Model Viewer -->
+        <model-viewer id="modelViewer" src="dish.glb" alt="Burger Meal 3D Model" camera-controls touch-action="pan-y"
+            auto-rotate auto-rotate-delay="0" rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look"
+            ar-scale="fixed" shadow-intensity="1" environment-image="neutral" exposure="1"
+            camera-orbit="0deg 75deg 1.5m" min-camera-orbit="auto auto auto" max-camera-orbit="auto auto auto"
+            interpolation-decay="200">
+        </model-viewer>
+
+        <!-- AR Button -->
+        <button class="ar-button" id="arButton">View in AR</button>
+    </div>
+
+    <script>
+        const modelViewer = document.getElementById('modelViewer');
+        const loadingBar = document.getElementById('loadingBar');
+        const loadingPercentage = document.getElementById('loadingPercentage');
+        const arButton = document.getElementById('arButton');
+
+        // Track loading progress
+        modelViewer.addEventListener('progress', (event) => {
+            const progress = event.detail.totalProgress * 100;
+            loadingBar.style.width = progress + '%';
+            loadingPercentage.textContent = Math.round(progress) + '%';
+        });
+
+        // When model is loaded
+        modelViewer.addEventListener('load', () => {
+            // Complete the loading bar
+            loadingBar.style.width = '100%';
+            loadingPercentage.textContent = '100%';
+
+            // After a short delay, show the model and AR button
+            setTimeout(() => {
+                modelViewer.classList.add('loaded');
+                arButton.classList.add('visible');
+            }, 500);
+        });
+
+        // AR Button Click Handler
+        arButton.addEventListener('click', () => {
+            if (modelViewer.canActivateAR) {
+                modelViewer.activateAR();
+            } else {
+                // Fallback: just focus on the 3D model
+                modelViewer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        // Error handling
+        modelViewer.addEventListener('error', (event) => {
+            console.error('Error loading model:', event.detail);
+            loadingPercentage.textContent = 'Error loading model';
+            loadingBar.style.background = 'linear-gradient(90deg, #ff4d4d, #ff6666)';
+        });
+    </script>
+</body>
+
+</html>
